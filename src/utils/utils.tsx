@@ -23,6 +23,7 @@ import {
   IDPServer,
   CertificateMapping,
   DNSZone,
+  DNSForwardZone,
 } from "./datatypes/globalDataTypes";
 // Errors
 import { FetchBaseQueryError } from "@reduxjs/toolkit/dist/query";
