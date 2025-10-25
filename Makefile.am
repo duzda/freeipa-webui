@@ -1,7 +1,7 @@
 NULL =
 
 appdir = $(IPA_DATA_DIR)/modern-ui
-licensedir = $(DESTDIR)$(datarootdir)/licenses/$(PACKAGE_NAME)-server-common/modern-ui
+licensedir = $(DESTDIR)$(datarootdir)/licenses/$(NAME)-server-common/modern-ui
 
 EXTRA_DIST =		\
 	$(NULL)
