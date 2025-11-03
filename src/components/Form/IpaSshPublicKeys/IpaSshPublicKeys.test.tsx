@@ -35,8 +35,10 @@ const shouldFail = (payload) => {
 };
 
 // Mock of rpc: useSimpleMutCommandMutation
-vi.mock("src/services/rpc", () => ({
-  useSimpleMutCommandMutation: vi.fn(() => [
+vi.mock(import("src/services/rpc"), async (original) => {
+  const module = await original();
+  // The function doesn't match the expected type, however the body of the function is correct.
+  const useSimpleMutCommandMutation = vi.fn(() => [
     // updateSSHKey
     async (payload) => {
       console.log("updateSSHKey called with:", payload);
@@ -57,8 +59,13 @@ vi.mock("src/services/rpc", () => ({
         },
       };
     },
-  ]),
-}));
+  ]) as unknown as (typeof module)["useSimpleMutCommandMutation"];
+
+  return {
+    ...module,
+    useSimpleMutCommandMutation: useSimpleMutCommandMutation,
+  };
+});
 
 describe("IpaSshPublicKeys Component", () => {
   const mockOnChange = vi.fn((ipaObject) => {
