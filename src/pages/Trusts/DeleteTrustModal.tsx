@@ -6,10 +6,9 @@ import {
   ContentVariants,
   Spinner,
 } from "@patternfly/react-core";
-// Hooks
-import useAlerts from "src/hooks/useAlerts";
 import useApiError from "src/hooks/useApiErrorModals";
 // RPC
+import { addAlert } from "src/store/alerts";
 import { useDeleteTrustsMutation } from "src/services/rpcTrusts";
 // Data types
 import { ErrorData, Trust } from "src/utils/datatypes/globalDataTypes";
@@ -32,9 +31,6 @@ interface DeleteTrustModalProps {
 }
 
 const DeleteTrustModal = (props: DeleteTrustModalProps) => {
-  // Alerts to show in the UI
-  const alerts = useAlerts();
-
   // RPC calls
   const [deleteTrusts] = useDeleteTrustsMutation();
 
@@ -75,11 +71,7 @@ const DeleteTrustModal = (props: DeleteTrustModalProps) => {
               props.updateIsDeleteButtonDisabled(true);
               props.updateIsDeletion(true);
 
-              alerts.addAlert(
-                "remove-trusts-success",
-                "Trusts removed",
-                "success"
-              );
+              addAlert("remove-trusts-success", "Trusts removed", "success");
 
               props.onClose();
               // Refresh data
@@ -158,7 +150,6 @@ const DeleteTrustModal = (props: DeleteTrustModalProps) => {
 
   return (
     <>
-      <alerts.ManagedAlerts />
       <ModalWithFormLayout
         dataCy="trusts-delete-modal"
         variantType="medium"
