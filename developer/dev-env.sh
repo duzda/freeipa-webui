@@ -123,13 +123,14 @@ build_container() {
     podman build -t "${image_name}:base" \
         --build-arg distro_image="${distro_image:-${distro}}" \
         --build-arg distro_tag="${distro_tag:-"latest"}" \
+        --no-cache \
         -f "containerfiles/${distro}" "${SCRIPT_DIR}" \
         || die "Failed to build base image"
     # Start build container
     start_container "${image_name}:base"
     # Deploy FreeIPA
     log "=== Deploying FreeIPA ==="
-    ansible-playbook -i "${SCRIPT_DIR}/inventory.yml" \
+    ansible-playbook -i "${SCRIPT_DIR}/scenarios/single-server/inventory.yml" \
         "${SCRIPT_DIR}/deploy-ipaserver.yml" || die "Failed to deploy IPA"
     # Save image locally
     log "=== Commit container image as '${image_name}:latest' ==="
@@ -225,7 +226,7 @@ build_scenario() {
     then
         [[ "${scenario}" == "single-server" ]] \
             || die "Command 'podman-compose' is required for building scenarios"
-        build_container
+        build_container "quay.io/ansible-freeipa/webui-dev"
         return $?
     fi
     scenario_dir="${SCRIPT_DIR}/scenarios/${scenario}"
@@ -301,8 +302,8 @@ else
 fi
 
 default_image="quay.io/ansible-freeipa/webui-dev:latest"
-image_id="$(podman images -f "reference=webui-dev:latest" --format="{{ .Id }}")"
-[ -z "${image_id}" ] && fetch_image="${default_image}" || fetch_image=""
+image_id="$(podman images -f "reference=${default_image}" --format="{{ .Id }}")"
+[[ -z "${image_id}" ]] && fetch_image="${default_image}" || fetch_image=""
 action="start"
 
 while getopts ":-hBcCdfiklprs" option "$@"
