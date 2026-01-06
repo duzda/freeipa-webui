@@ -101,21 +101,10 @@ const ManagedByHosts = (props: ManagedByHostsProps) => {
     }
   }, [fullHostsQuery.data, fullHostsQuery.isFetching]);
 
-  // Get type of the entity to show as text
-  const getEntityType = () => {
-    if (props.from === "host") {
-      return "host";
-    } // Add more entity types here.
-    // Default is "hosts"
-    else {
-      return "host";
-    }
-  };
-
   // Computed "states"
   const someItemSelected = hostsSelected.length > 0;
   const showTableRows = hosts.length > 0;
-  const entityType = getEntityType();
+  const entityType = "host";
 
   // Dialogs and actions
   const [showAddModal, setShowAddModal] = React.useState(false);
