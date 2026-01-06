@@ -181,12 +181,12 @@ const AppLayout = (props: PropsToAppLayout) => {
           />
         </MastheadToggle>
         <MastheadBrand>
-          <MastheadLogo className="pf-v6-u-mt-sm">
-            <MastheadBrand>
-              <MastheadLogo>
-                <Brand src={headerLogo} alt="FreeIPA Logo" />
-              </MastheadLogo>
-            </MastheadBrand>
+          <MastheadLogo className="pf-v6-u-display-flex">
+            <Brand
+              src={headerLogo}
+              alt="IPA Logo"
+              className="pf-v6-u-my-auto"
+            />
           </MastheadLogo>
         </MastheadBrand>
       </MastheadMain>
