@@ -506,7 +506,6 @@ const AddUser = (props: PropsToAddUser) => {
     <Button
       data-cy="modal-button-add"
       key="add-new-user"
-      variant="secondary"
       isDisabled={buttonDisabled || addSpinning}
       type="submit"
       form="users-add-user-modal"
