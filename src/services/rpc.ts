@@ -260,18 +260,26 @@ export const api = createApi({
     }),
     getObjectMetadata: build.query<Metadata, void>({
       query: () => {
-        return getCommand({
-          method: "json_metadata",
-          params: [
-            [],
-            {
-              object: "all",
-            },
-          ],
-        });
+        return {
+          url: "ipa/session/json",
+          method: "POST",
+          body: {
+            method: "json_metadata",
+            params: [
+              [],
+              {
+                object: "all",
+                methodname: "all",
+                command: "all",
+              },
+            ],
+          },
+        };
       },
-      transformResponse: (response: ShowRPCResponse): Metadata =>
-        response.result,
+      transformResponse: (response: ShowRPCResponse): Metadata => {
+        console.log(response);
+        return response.result;
+      },
       providesTags: ["ObjectMetadata"],
     }),
     // Basic find/show query: Hosts, Services, ...
