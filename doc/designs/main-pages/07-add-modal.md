@@ -151,9 +151,8 @@ const AddEntityModal = (props: PropsToAddModal) => {
         }
         if (response.data?.result) {
           dispatch(addAlert({ name: "add-entity-success", title: "New entity added", variant: "success" }));
-          clearFields();
+          cleanAndCloseModal();
           props.onRefresh();
-          props.onClose();
         }
       }
       setIsAddButtonSpinning(false);

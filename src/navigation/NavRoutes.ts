@@ -72,6 +72,7 @@ const TopologyGroupRef = "topology-graph";
 // - Role-based access control
 const RbacGroupRef = "rbac";
 const PrivilegesGroupRef = "privileges";
+const PermissionsGroupRef = "permissions";
 // - Configuration
 const ConfigRef = "configuration";
 
@@ -443,6 +444,13 @@ export const getNavigationRoutes = (
               group: PrivilegesGroupRef,
               title: `${BASE_TITLE} - Privileges`,
               path: "privileges",
+              items: [],
+            },
+            {
+              label: "Permissions",
+              group: PermissionsGroupRef,
+              title: `${BASE_TITLE} - Permissions`,
+              path: "permissions",
               items: [],
             },
           ],
