@@ -144,6 +144,14 @@ const extendedApi = api.injectEndpoints({
         });
       },
     }),
+    findGroups: build.query<FindRPCResponse, void>({
+      query: () => {
+        return getCommand({
+          method: "group_find",
+          params: [[], { version: API_VERSION_BACKUP }],
+        });
+      },
+    }),
     /**
      * Remove groups
      * @param {UserGroup[]} listOfGroups - List of groups to remove
@@ -437,6 +445,7 @@ export const useGettingGroupsQuery = (payloadData) => {
 
 export const {
   useAddGroupMutation,
+  useFindGroupsQuery,
   useRemoveGroupsMutation,
   useRemoveGroupMutation,
   useAddToGroupsMutation,

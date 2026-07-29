@@ -225,6 +225,24 @@ export interface Privilege {
   description: string;
 }
 
+export interface Permission {
+  cn: string;
+  ipapermright: string[];
+  attrs: string[];
+  ipapermincludedattrmultivalued: string[]; // mod only
+  ipapermexcludedattrmultivalued: string[]; // mod only
+  ipapermbindruletype: string;
+  ipapermlocation: string;
+  extratargetfilter: string[];
+  ipapermtargetfilter: string[];
+  ipapermtarget: string;
+  ipapermtargetto: string;
+  ipapermtargetfrom: string;
+  memberof: string[];
+  targetgroup: string;
+  type: string;
+}
+
 export interface HBACRule {
   hostcategory: string;
   servicecategory: string;
@@ -538,6 +556,7 @@ export interface ParamMetadata {
   required: boolean;
   sortorder: number;
   type: string;
+  values?: string[];
 }
 
 export interface RadiusServer {

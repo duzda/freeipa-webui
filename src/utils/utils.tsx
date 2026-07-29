@@ -13,6 +13,7 @@ import {
   IdRange,
   Metadata,
   Netgroup,
+  Permission,
   Privilege,
   Role,
   Service,
@@ -214,6 +215,9 @@ export const isRoleSelectable = (role: Role) => role.cn !== "";
 
 export const isPrivilegeSelectable = (privilege: Privilege) =>
   privilege.cn !== "";
+
+export const isPermissionSelectable = (permission: Permission) =>
+  permission.cn !== "";
 
 export const isIdpServerSelectable = (idpServer: IDPServer) =>
   idpServer.cn !== "";
@@ -502,6 +506,17 @@ export const parseDn = (dn: string) => {
 
   return result as DN;
 };
+
+/**
+ * Validate a DN, very simple validation, as there are too many cases to handle
+ * @param dn - The DN to validate
+ * @returns {boolean} - True if the DN is valid, false otherwise
+ */
+export const isValidDn = (dn: string) =>
+  dn.split(",").every((rdn) => {
+    const splitted = rdn.split("=");
+    return splitted.length === 2 && splitted[0] !== "" && splitted[1] !== "";
+  });
 
 /**
  * Given a (potential) __datetime__ object, parse it into a Date object or null (if empty)

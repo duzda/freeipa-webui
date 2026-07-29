@@ -17,6 +17,7 @@ interface PropsToSimpleSelector {
   dataCy: string;
   id: string;
   selected: string;
+  returnedProperty?: keyof SelectOptionProps;
   options: SelectOptionProps[];
   onSelectedChange: (selected: string) => void;
   ariaLabel?: string;
@@ -33,10 +34,10 @@ const SimpleSelector = (props: PropsToSimpleSelector) => {
 
   const onSelect = (
     _event: React.MouseEvent<Element, MouseEvent> | undefined,
-    value: string | number | undefined
+    value: SelectOptionProps
   ) => {
-    props.onSelectedChange(value as string);
-    setSelected(value as string);
+    props.onSelectedChange(value[props.returnedProperty ?? "value"]);
+    setSelected(value.value);
     setIsOpen(false);
   };
 
@@ -80,10 +81,10 @@ const SimpleSelector = (props: PropsToSimpleSelector) => {
           props.options.map((option, idx) => (
             <SelectOption
               data-cy={props.dataCy + "-select-" + option.key}
-              id={option.key + "-" + idx}
-              key={option.key + "-" + idx}
+              id={option.key}
+              key={option.key}
               tabIndex={idx}
-              value={option.value}
+              value={option}
             >
               {option.value}
             </SelectOption>
