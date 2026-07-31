@@ -243,7 +243,7 @@ const TypeAheadSelect = (props: PropsToTypeAheadSelect) => {
           onClick={onInputClick}
           onChange={onTextInputChange}
           onKeyDown={onInputKeyDown}
-          id="typeahead-select-input"
+          id={`${props.id}-typeahead-select-input`}
           data-cy={"typeahead-select-input"}
           autoComplete="off"
           innerRef={textInputRef}
