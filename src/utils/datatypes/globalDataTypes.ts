@@ -200,11 +200,6 @@ export interface Netgroup {
   hostcategory: string;
 }
 
-export interface RolesOld {
-  name: string;
-  description: string;
-}
-
 export interface Role {
   cn: string;
   description: string;
@@ -227,12 +222,6 @@ export interface SysAccount {
 
 export interface Privilege {
   cn: string;
-  description: string;
-}
-
-export interface HBACRulesOld {
-  name: string;
-  status: string;
   description: string;
 }
 
@@ -264,12 +253,6 @@ export interface HBACServiceGroup {
   cn: string;
   dn: string;
   member_hbacsvc: string[];
-}
-
-export interface SudoRulesOld {
-  name: string;
-  status: string;
-  description: string;
 }
 
 export interface SudoRule {
