@@ -44,6 +44,10 @@ code {
   padding: 0.2em;
 }
 
+.login-page-list {
+  list-style-type: "· ";
+}
+
 .topology-ca-blue-edge {
   &.pf-topology__edge,
   .pf-topology-connector-arrow {
