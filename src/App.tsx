@@ -20,19 +20,14 @@ import {
   updateCaIsEnabled,
   updateVaultConfiguration,
 } from "src/store/Global/global-slice";
-import { setIsLogin, setIsLogout } from "./store/Global/auth-slice";
+import { setLoggedUser, setLoggedOut } from "./store/Global/auth-slice";
 // Alerts
 import ManagedAlerts from "./components/ManagedAlerts";
 
 const App: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
 
-  // Default: no user logged in & no loaded information about it
-  const [loggedInUser, setLoggedInUser] = React.useState<string | null>(null);
-  const [hasUser, setHasUser] = React.useState<boolean>(false);
-  const [isDataLoaded, setIsDataLoaded] = React.useState<boolean>(false);
-
-  const userLoggedIn = useAppSelector((state) => state.auth.isUserLoggedIn);
+  const loggedUser = useAppSelector((state) => state.auth.loggedUser);
 
   // [API Call] Get initial data
   const payloadDataBatch: Command[] = [];
@@ -57,22 +52,18 @@ const App: React.FunctionComponent = () => {
 
   const {
     data: initialBatchResponse,
-    isLoading: isInitialBatchLoading,
+    isFetching: isInitialBatchFetching,
     // TODO: Manage error handling correctly
   } = useBatchCommandQuery(payloadDataBatch);
 
   // Store data in global slice (Redux)
   React.useEffect(() => {
-    if (!isInitialBatchLoading && initialBatchResponse === undefined) {
+    if (initialBatchResponse === undefined) {
       // Assume that the user is not loaded
-      setLoggedInUser(null);
-      setIsDataLoaded(true);
-      setHasUser(false);
-      dispatch(setIsLogout());
+      dispatch(setLoggedOut());
     }
 
-    if (!isInitialBatchLoading && initialBatchResponse !== undefined) {
-      setIsDataLoaded(true);
+    if (initialBatchResponse !== undefined) {
       // 0: IPA server configuration ("config_show")
       const configShowResponse = initialBatchResponse.result.results[0].result;
       dispatch(updateIpaServerConfiguration(configShowResponse));
@@ -102,37 +93,27 @@ const App: React.FunctionComponent = () => {
 
       // Set the login status if user found in the whoami response
       if (user) {
-        setLoggedInUser(user);
-        setHasUser(true);
         // [Redux] Update the login status
-        const loginPayload = {
-          loggedInUser: loggedInUser as string,
-          error: null,
-        };
-        dispatch(setIsLogin(loginPayload));
+        dispatch(setLoggedUser(user));
       } else {
-        setLoggedInUser(null);
-        setHasUser(false);
-        dispatch(setIsLogout());
+        dispatch(setLoggedOut());
       }
     }
-  }, [isInitialBatchLoading]);
+  }, [initialBatchResponse]);
 
-  if (isInitialBatchLoading && !initialBatchResponse) {
+  if (isInitialBatchFetching) {
     return <DataSpinner />;
   }
+
   return (
     <>
       <ManagedAlerts />
-      {hasUser && userLoggedIn && (
-        <AppLayout loggedInUser={loggedInUser}>
-          <AppRoutes isInitialDataLoaded={isDataLoaded} />
+      {loggedUser !== null ? (
+        <AppLayout loggedInUser={loggedUser}>
+          <AppRoutes />
         </AppLayout>
-      )}
-      {!hasUser && !userLoggedIn && (
-        <>
-          <AppRoutes isInitialDataLoaded={isDataLoaded} />
-        </>
+      ) : (
+        <AppRoutes />
       )}
     </>
   );

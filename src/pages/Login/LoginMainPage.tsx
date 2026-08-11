@@ -35,7 +35,7 @@ import { useAppDispatch } from "src/store/hooks";
 import { useLocation, useNavigate } from "react-router";
 import { Link } from "react-router";
 import { LoginPage } from "./LoginPage";
-import { setIsLogin } from "src/store/Global/auth-slice";
+import { setLoggedUser } from "src/store/Global/auth-slice";
 
 interface StateFromSyncOtpPage {
   alertMessage: string;
@@ -166,10 +166,7 @@ const LoginMainPage = () => {
   // Action on login success
   const onSuccessLogin = () => {
     // Sore data on Redux
-    dispatch(setIsLogin({ loggedInUser: username, error: null }));
-
-    // Forcing full page to reload and access the protected pages (Default: active users)
-    window.location.reload();
+    dispatch(setLoggedUser(username));
     // TODO: Improve this mechanism and redirect to the last page visited
   };
 

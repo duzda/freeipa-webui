@@ -33,7 +33,7 @@ import headerLogo from "/assets/images/header-logo.png";
 import avatarImg from "/assets/images/avatarImg.svg";
 // Redux
 import { useAppDispatch } from "./store/hooks";
-import { setIsLogout } from "./store/Global/auth-slice";
+import { setLoggedOut } from "./store/Global/auth-slice";
 // RPC
 import { useLogoutMutation } from "./services/rpcAuth";
 import { useGetUserDetailsByUidMutation } from "./services/rpcUsers";
@@ -74,10 +74,8 @@ const AppLayout = (props: PropsToAppLayout) => {
   const onLogout = () => {
     logout().then((response) => {
       if ("data" in response && !response.data?.error) {
-        dispatch(setIsLogout());
+        dispatch(setLoggedOut());
         localStorage.setItem("isKerberosDisabled", "true");
-        // Forcing full page to reload and redirect to login page
-        window.location.reload();
       }
     });
   };
