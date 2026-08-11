@@ -75,6 +75,7 @@ const AppLayout = (props: PropsToAppLayout) => {
     logout().then((response) => {
       if ("data" in response && !response.data?.error) {
         dispatch(setIsLogout());
+        localStorage.setItem("isKerberosDisabled", "true");
         // Forcing full page to reload and redirect to login page
         window.location.reload();
       }

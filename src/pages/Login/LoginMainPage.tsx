@@ -4,7 +4,6 @@ import {
   LoginFooterItem,
   LoginForm,
   LoginMainFooterLinksItem,
-  LoginPage,
   ListItem,
   ListVariant,
   Content,
@@ -14,6 +13,7 @@ import {
   ModalBody,
   ModalHeader,
   ModalFooter,
+  List,
 } from "@patternfly/react-core";
 // Hooks
 import { addAlert } from "src/store/Global/alerts-slice";
@@ -31,10 +31,11 @@ import {
 } from "src/services/rpcAuth";
 // Redux
 import { useAppDispatch } from "src/store/hooks";
-import { setIsLogin } from "src/store/Global/auth-slice";
 // Navigation
 import { useLocation, useNavigate } from "react-router";
 import { Link } from "react-router";
+import { LoginPage } from "./LoginPage";
+import { setIsLogin } from "src/store/Global/auth-slice";
 
 interface StateFromSyncOtpPage {
   alertMessage: string;
@@ -71,10 +72,6 @@ const LoginMainPage = () => {
   const [isValidPassword, setIsValidPassword] = React.useState(true);
   const [authenticating, setAuthenticating] = React.useState(false);
 
-  // Authentication method (assumes user + password by default)
-  // - This will help to get the user credentials if the user is logged in via Kerberos
-  let isUserPwdAuthentication = true;
-
   const handleUsernameChange = (
     _event: React.FormEvent<HTMLInputElement>,
     value: string
@@ -94,7 +91,8 @@ const LoginMainPage = () => {
    * 1.- Check if Kerberos is enabled
    * 2.- Based on the result, authenticate using one method (Kerberos) or the other (via user + password)
    */
-  const isKerberosEnabled = true;
+  const isKerberosDisabled =
+    localStorage.getItem("isKerberosDisabled") === "true";
 
   // API calls
   const [onUserPwdLogin] = useUserPasswordLoginMutation();
@@ -103,7 +101,7 @@ const LoginMainPage = () => {
 
   // Kerberos login when loading the component
   React.useEffect(() => {
-    if (!username && isKerberosEnabled) {
+    if (!username && !isKerberosDisabled) {
       onKrbLogin().then((response) => {
         if ("error" in response) {
           const receivedError = response.error as MetaResponse;
@@ -116,18 +114,17 @@ const LoginMainPage = () => {
             wwwAuthenticateHeader?.startsWith("Negotiate")
           ) {
             // Success on Kerberos login
-            isUserPwdAuthentication = false;
             onSuccessLogin();
           } else {
             // Set error without showing the modal
             setErrorMessage("Authentication with Kerberos failed");
           }
         } else {
-          isUserPwdAuthentication = false;
           onSuccessLogin();
         }
       });
     }
+    localStorage.removeItem("isKerberosDisabled");
   }, []);
 
   // Handling API errors
@@ -169,11 +166,7 @@ const LoginMainPage = () => {
   // Action on login success
   const onSuccessLogin = () => {
     // Sore data on Redux
-    if (isUserPwdAuthentication) {
-      dispatch(setIsLogin({ loggedInUser: username, error: null }));
-    } else {
-      // TODO: Extract the username from the Kerberos ticket and store in Redux
-    }
+    dispatch(setIsLogin({ loggedInUser: username, error: null }));
 
     // Forcing full page to reload and access the protected pages (Default: active users)
     window.location.reload();
@@ -230,7 +223,7 @@ const LoginMainPage = () => {
     setShowHelperText(!username || !password);
 
     setAuthenticating(true);
-    if (!username && isKerberosEnabled) {
+    if (!username) {
       onKrbLogin().then((response) => {
         if ("error" in response) {
           const receivedError = response.error as MetaResponse;
@@ -243,7 +236,6 @@ const LoginMainPage = () => {
             wwwAuthenticateHeader?.startsWith("Negotiate")
           ) {
             // Success on Kerberos login
-            isUserPwdAuthentication = false;
             onSuccessLogin();
           } else {
             // Set error without showing the modal
@@ -251,7 +243,6 @@ const LoginMainPage = () => {
           }
         } else {
           // Success on Kerberos login
-          isUserPwdAuthentication = false;
           onSuccessLogin();
         }
       });
@@ -369,30 +360,44 @@ const LoginMainPage = () => {
     />
   );
 
-  const placeHolderText =
-    "· To log in with username and password, enter them in the corresponding fields, then click 'Log in'. \n\n" +
-    "· To log in with Kerberos, please make sure you have valid tickets (obtainable via kinit) and configured the browser correctly, then click 'Log in'. \n\n" +
-    "· To log in with certificate, please make sure you have valid personal certificate.";
+  const placeHolderText = (
+    <List component="ul" className="pf-v6-u-pt-0 login-page-list">
+      <ListItem>
+        <a href="../ui">Take me back to the old WebUI</a>
+      </ListItem>
+      <ListItem>
+        To log in with username and password, enter them in the corresponding
+        fields, then click &apos;Log in&apos;.
+      </ListItem>
+      <ListItem>
+        To log in with Kerberos, please make sure you have valid tickets
+        (obtainable via kinit) and configured the browser correctly, then click
+        &apos;Log in&apos;.
+      </ListItem>
+      <ListItem>
+        To log in with certificate, please make sure you have valid personal
+        certificate.
+      </ListItem>
+    </List>
+  );
 
   return (
-    <>
-      <LoginPage
-        style={{ whiteSpace: "pre-line" }}
-        footerListVariants={ListVariant.inline}
-        brandImgSrc={BrandImg}
-        brandImgAlt="FreeIPA logo"
-        backgroundImgSrc={BackgroundImg}
-        footerListItems={listItem}
-        textContent={placeHolderText}
-        loginTitle="Log in to your account"
-        loginSubtitle="Enter your credentials."
-        socialMediaLoginContent={socialMediaLoginContent}
-        socialMediaLoginAriaLabel="Other options to log in"
-      >
-        {loginForm}
-        {showErrorModal && errorModal(errorMessage)}
-      </LoginPage>
-    </>
+    <LoginPage
+      style={{ whiteSpace: "pre-line" }}
+      footerListVariants={ListVariant.inline}
+      brandImgSrc={BrandImg}
+      brandImgAlt="FreeIPA logo"
+      backgroundImgSrc={BackgroundImg}
+      footerListItems={listItem}
+      loginPageContent={placeHolderText}
+      loginTitle="Log in to your account"
+      loginSubtitle="Enter your credentials."
+      socialMediaLoginContent={socialMediaLoginContent}
+      socialMediaLoginAriaLabel="Other options to log in"
+    >
+      {loginForm}
+      {showErrorModal && errorModal(errorMessage)}
+    </LoginPage>
   );
 };
 
