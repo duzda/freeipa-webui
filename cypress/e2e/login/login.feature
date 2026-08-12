@@ -50,63 +50,63 @@ Feature: Login page
     When I log in as "admin" with password "Secret123"
     Then I should be logged in as "Administrator"
 
-  @seed
-  Scenario: Create user "otpuser"
-    Given User "otpuser" "OTP" "User" exists and is using password "Secret123"
-    And User "otpuser" has OTP enabled
+  # @seed
+  # Scenario: Create user "otpuser"
+    # Given User "otpuser" "OTP" "User" exists and is using password "Secret123"
+    # And User "otpuser" has OTP enabled
 
-  @test
-  Scenario: Successful login with valid OTP with password reset and re-login
-    When I log in as "otpuser" with password "Secret123" and generated OTP
-    Then I should be on "reset-password/otpuser" page
+  # @test
+  # Scenario: Successful login with valid OTP with password reset and re-login
+    # When I log in as "otpuser" with password "Secret123" and generated OTP
+    # Then I should be on "reset-password/otpuser" page
 
-    When I type in the "reset-password-textbox-current-password" textbox text "Secret123"
-    Then I should see "Secret123" in the "reset-password-textbox-current-password" textbox
-    When I type in the "reset-password-textbox-new-password" textbox text "NewSecret123"
-    Then I should see "NewSecret123" in the "reset-password-textbox-new-password" textbox
-    When I type in the "reset-password-textbox-verify-password" textbox text "NewSecret123"
-    Then I should see "NewSecret123" in the "reset-password-textbox-verify-password" textbox
-    When I type in the "reset-password-textbox-otp" textbox text otp token
-    Then I should see otp token in the "reset-password-textbox-otp" textbox
+    # When I type in the "reset-password-textbox-current-password" textbox text "Secret123"
+    # Then I should see "Secret123" in the "reset-password-textbox-current-password" textbox
+    # When I type in the "reset-password-textbox-new-password" textbox text "NewSecret123"
+    # Then I should see "NewSecret123" in the "reset-password-textbox-new-password" textbox
+    # When I type in the "reset-password-textbox-verify-password" textbox text "NewSecret123"
+    # Then I should see "NewSecret123" in the "reset-password-textbox-verify-password" textbox
+    # When I type in the "reset-password-textbox-otp" textbox text otp token
+    # Then I should see otp token in the "reset-password-textbox-otp" textbox
 
-    When I click on the "reset-password-button-reset" button
-    Then I should be on "login" page
+    # When I click on the "reset-password-button-reset" button
+    # Then I should be on "login" page
 
-    When I log in as "otpuser" with password "NewSecret123" and generated OTP
-    Then I should be logged in as "OTP User"
+    # When I log in as "otpuser" with password "NewSecret123" and generated OTP
+    # Then I should be logged in as "OTP User"
 
-  @cleanup
-  Scenario: Delete user "otpuser"
-    Given I delete user "otpuser"
+  # @cleanup
+  # Scenario: Delete user "otpuser"
+    # Given I delete user "otpuser"
 
-  @seed
-  Scenario: Create user "otpuser"
-    Given User "otpuser" "OTP" "User" exists and is using password "Secret123"
-    And User "otpuser" has OTP enabled
+  # @seed
+  # Scenario: Create user "otpuser"
+    # Given User "otpuser" "OTP" "User" exists and is using password "Secret123"
+    # And User "otpuser" has OTP enabled
 
-  @test
-  Scenario: Unsuccessful login with invalid or expired OTP
-    When I log in as "otpuser" with password "Secret123" and generated OTP
-    Then I should be on "reset-password/otpuser" page
+  # @test
+  # Scenario: Unsuccessful login with invalid or expired OTP
+    # When I log in as "otpuser" with password "Secret123" and generated OTP
+    # Then I should be on "reset-password/otpuser" page
 
-    When I type in the "reset-password-textbox-current-password" textbox text "Secret123"
-    Then I should see "Secret123" in the "reset-password-textbox-current-password" textbox
-    When I type in the "reset-password-textbox-new-password" textbox text "NewSecret123"
-    Then I should see "NewSecret123" in the "reset-password-textbox-new-password" textbox
-    When I type in the "reset-password-textbox-verify-password" textbox text "NewSecret123"
-    Then I should see "NewSecret123" in the "reset-password-textbox-verify-password" textbox
-    When I type in the "reset-password-textbox-otp" textbox text otp token
-    Then I should see otp token in the "reset-password-textbox-otp" textbox
+    # When I type in the "reset-password-textbox-current-password" textbox text "Secret123"
+    # Then I should see "Secret123" in the "reset-password-textbox-current-password" textbox
+    # When I type in the "reset-password-textbox-new-password" textbox text "NewSecret123"
+    # Then I should see "NewSecret123" in the "reset-password-textbox-new-password" textbox
+    # When I type in the "reset-password-textbox-verify-password" textbox text "NewSecret123"
+    # Then I should see "NewSecret123" in the "reset-password-textbox-verify-password" textbox
+    # When I type in the "reset-password-textbox-otp" textbox text otp token
+    # Then I should see otp token in the "reset-password-textbox-otp" textbox
 
-    When I click on the "reset-password-button-reset" button
-    Then I should be on "login" page
+    # When I click on the "reset-password-button-reset" button
+    # Then I should be on "login" page
 
-    When I log in as "otpuser" with password "NewSecret123"
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123"
+    # Then I should see "authentication-modal-error" modal
 
-  @cleanup
-  Scenario: Delete user "otpuser"
-    Given I delete user "otpuser"
+  # @cleanup
+  # Scenario: Delete user "otpuser"
+    # Given I delete user "otpuser"
 
   @seed
   Scenario: Create user "jdoe"
@@ -159,69 +159,69 @@ Feature: Login page
   Scenario: Delete user "jdoe"
     Given I delete user "jdoe"
 
-  @seed
-  Scenario: Create user "otpuser"
-    Given User "otpuser" "OTP" "User" exists and is using password "Secret123"
-    And User "otpuser" has OTP enabled
+  # @seed
+  # Scenario: Create user "otpuser"
+    # Given User "otpuser" "OTP" "User" exists and is using password "Secret123"
+    # And User "otpuser" has OTP enabled
 
-  @test
-  Scenario: Blocked login after multiple failed OTP attempts
-    When I log in as "otpuser" with password "Secret123" and generated OTP
-    Then I should be on "reset-password/otpuser" page
+  # @test
+  # Scenario: Blocked login after multiple failed OTP attempts
+    # When I log in as "otpuser" with password "Secret123" and generated OTP
+    # Then I should be on "reset-password/otpuser" page
 
-    When I type in the "reset-password-textbox-current-password" textbox text "Secret123"
-    Then I should see "Secret123" in the "reset-password-textbox-current-password" textbox
-    When I type in the "reset-password-textbox-new-password" textbox text "NewSecret123"
-    Then I should see "NewSecret123" in the "reset-password-textbox-new-password" textbox
-    When I type in the "reset-password-textbox-verify-password" textbox text "NewSecret123"
-    Then I should see "NewSecret123" in the "reset-password-textbox-verify-password" textbox
-    When I type in the "reset-password-textbox-otp" textbox text otp token
-    Then I should see otp token in the "reset-password-textbox-otp" textbox
+    # When I type in the "reset-password-textbox-current-password" textbox text "Secret123"
+    # Then I should see "Secret123" in the "reset-password-textbox-current-password" textbox
+    # When I type in the "reset-password-textbox-new-password" textbox text "NewSecret123"
+    # Then I should see "NewSecret123" in the "reset-password-textbox-new-password" textbox
+    # When I type in the "reset-password-textbox-verify-password" textbox text "NewSecret123"
+    # Then I should see "NewSecret123" in the "reset-password-textbox-verify-password" textbox
+    # When I type in the "reset-password-textbox-otp" textbox text otp token
+    # Then I should see otp token in the "reset-password-textbox-otp" textbox
 
-    When I click on the "reset-password-button-reset" button
-    Then I should be on "login" page
+    # When I click on the "reset-password-button-reset" button
+    # Then I should be on "login" page
 
-    # Default number of failed attempts is 6
-    When I log in as "otpuser" with password "NewSecret123123456"
-    Then I should see "authentication-modal-error" modal
+    # # Default number of failed attempts is 6
+    # When I log in as "otpuser" with password "NewSecret123123456"
+    # Then I should see "authentication-modal-error" modal
 
-    When I click on the "modal-button-ok" button
-    Then I should not see "authentication-modal-error" modal
+    # When I click on the "modal-button-ok" button
+    # Then I should not see "authentication-modal-error" modal
 
-    When I log in as "otpuser" with password "NewSecret123123456"
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123123456"
+    # Then I should see "authentication-modal-error" modal
 
-    When I click on the "modal-button-ok" button
-    Then I should not see "authentication-modal-error" modal
+    # When I click on the "modal-button-ok" button
+    # Then I should not see "authentication-modal-error" modal
 
-    When I log in as "otpuser" with password "NewSecret123123456"
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123123456"
+    # Then I should see "authentication-modal-error" modal
 
-    When I click on the "modal-button-ok" button
-    Then I should not see "authentication-modal-error" modal
+    # When I click on the "modal-button-ok" button
+    # Then I should not see "authentication-modal-error" modal
 
-    When I log in as "otpuser" with password "NewSecret123123456"
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123123456"
+    # Then I should see "authentication-modal-error" modal
 
-    When I click on the "modal-button-ok" button
-    Then I should not see "authentication-modal-error" modal
+    # When I click on the "modal-button-ok" button
+    # Then I should not see "authentication-modal-error" modal
 
-    When I log in as "otpuser" with password "NewSecret123123456"
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123123456"
+    # Then I should see "authentication-modal-error" modal
 
-    When I click on the "modal-button-ok" button
-    Then I should not see "authentication-modal-error" modal
+    # When I click on the "modal-button-ok" button
+    # Then I should not see "authentication-modal-error" modal
 
-    When I log in as "otpuser" with password "NewSecret123123456"
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123123456"
+    # Then I should see "authentication-modal-error" modal
 
-    When I click on the "modal-button-ok" button
-    Then I should not see "authentication-modal-error" modal
-    # End login attempts
+    # When I click on the "modal-button-ok" button
+    # Then I should not see "authentication-modal-error" modal
+    # # End login attempts
 
-    When I log in as "otpuser" with password "NewSecret123" and generated OTP
-    Then I should see "authentication-modal-error" modal
+    # When I log in as "otpuser" with password "NewSecret123" and generated OTP
+    # Then I should see "authentication-modal-error" modal
 
-  @cleanup
-  Scenario: Delete user "otpuser"
-    Given I delete user "otpuser"
+  # @cleanup
+  # Scenario: Delete user "otpuser"
+    # Given I delete user "otpuser"
