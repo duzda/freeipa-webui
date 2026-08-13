@@ -37,12 +37,9 @@ import { setLoggedOut } from "./store/Global/auth-slice";
 // RPC
 import { useLogoutMutation } from "./services/rpcAuth";
 import { useGetUserByUidQuery } from "./services/rpcUsers";
+import { Outlet } from "react-router";
 
-interface PropsToAppLayout {
-  children: React.ReactNode;
-}
-
-const AppLayout = (props: PropsToAppLayout) => {
+const AppLayout = () => {
   const dispatch = useAppDispatch();
 
   const loggedInUser = useAppSelector(
@@ -196,7 +193,9 @@ const AppLayout = (props: PropsToAppLayout) => {
       className="--pf-t--global--text--color--regular"
       isContentFilled
     >
-      <ContextualHelpPanel>{props.children}</ContextualHelpPanel>
+      <ContextualHelpPanel>
+        <Outlet />
+      </ContextualHelpPanel>
     </Page>
   );
 };

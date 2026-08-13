@@ -2,7 +2,6 @@ import React from "react";
 // PatternFly
 import "@patternfly/react-core/dist/styles/base.css";
 // Layouts
-import { AppLayout } from "./AppLayout";
 import DataSpinner from "./components/layouts/DataSpinner";
 // Navigation
 import { AppRoutes } from "./navigation/AppRoutes";
@@ -111,13 +110,7 @@ const App: React.FunctionComponent = () => {
   return (
     <>
       <ManagedAlerts />
-      {loggedIn ? (
-        <AppLayout>
-          <AppRoutes />
-        </AppLayout>
-      ) : (
-        <AppRoutes />
-      )}
+      <AppRoutes />
     </>
   );
 };
