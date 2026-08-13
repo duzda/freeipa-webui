@@ -86,14 +86,14 @@ import SelfServicePermissions from "src/pages/SelfServicePermissions/SelfService
 // Renders routes (React)
 export const AppRoutes = (): React.ReactElement => {
   // Redux: Get if user is logged in
-  const loggedUser = useAppSelector((state) => state.auth.loggedUser);
+  const loggedIn = useAppSelector((state) => state.auth.loggedIn);
 
   const configurationSettings = useConfigurationSettings();
   const dnsIsEnabled = configurationSettings.dnsIsEnabled;
 
   return (
     <Routes>
-      {loggedUser !== null ? (
+      {loggedIn ? (
         <>
           <Route path="active-users">
             <Route path="" element={<ActiveUsers />} />

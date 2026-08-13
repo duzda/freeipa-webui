@@ -35,7 +35,7 @@ import { useAppDispatch } from "src/store/hooks";
 import { useLocation, useNavigate } from "react-router";
 import { Link } from "react-router";
 import { LoginPage } from "./LoginPage";
-import { setLoggedUser } from "src/store/Global/auth-slice";
+import { setLoggedIn } from "src/store/Global/auth-slice";
 
 interface StateFromSyncOtpPage {
   alertMessage: string;
@@ -92,7 +92,7 @@ const LoginMainPage = () => {
    * 2.- Based on the result, authenticate using one method (Kerberos) or the other (via user + password)
    */
   const isKerberosDisabled =
-    localStorage.getItem("isKerberosDisabled") === "true";
+    sessionStorage.getItem("isKerberosDisabled") === "true";
 
   // API calls
   const [onUserPwdLogin] = useUserPasswordLoginMutation();
@@ -124,7 +124,6 @@ const LoginMainPage = () => {
         }
       });
     }
-    localStorage.removeItem("isKerberosDisabled");
   }, []);
 
   // Handling API errors
@@ -166,8 +165,8 @@ const LoginMainPage = () => {
   // Action on login success
   const onSuccessLogin = () => {
     // Sore data on Redux
-    dispatch(setLoggedUser(username));
-    // TODO: Improve this mechanism and redirect to the last page visited
+    dispatch(setLoggedIn());
+    sessionStorage.removeItem("isKerberosDisabled");
   };
 
   // Analyze the error reason
@@ -215,56 +214,71 @@ const LoginMainPage = () => {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setIsValidUsername(!!username);
-    setIsValidPassword(!!password);
-    setShowHelperText(!username || !password);
 
     setAuthenticating(true);
     if (!username) {
-      onKrbLogin().then((response) => {
-        if ("error" in response) {
-          const receivedError = response.error as MetaResponse;
+      onKrbLogin()
+        .then((response) => {
+          if ("error" in response) {
+            const receivedError = response.error as MetaResponse;
 
-          const status = receivedError.response?.status;
-          const wwwAuthenticateHeader =
-            receivedError.response?.headers.get("www-authenticate");
-          if (
-            status === 200 &&
-            wwwAuthenticateHeader?.startsWith("Negotiate")
-          ) {
+            const status = receivedError.response?.status;
+            const wwwAuthenticateHeader =
+              receivedError.response?.headers.get("www-authenticate");
+            if (
+              status === 200 &&
+              wwwAuthenticateHeader?.startsWith("Negotiate")
+            ) {
+              // Success on Kerberos login
+              onSuccessLogin();
+            } else {
+              // Set error without showing the modal
+              setErrorMessage("Authentication with Kerberos failed");
+              setIsValidUsername(!!username);
+              setIsValidPassword(!!password);
+              setShowHelperText(!username || !password);
+            }
+          } else {
             // Success on Kerberos login
             onSuccessLogin();
-          } else {
-            // Set error without showing the modal
-            setErrorMessage("Authentication with Kerberos failed");
           }
-        } else {
-          // Success on Kerberos login
-          onSuccessLogin();
-        }
-      });
+        })
+        .catch(() => {
+          setIsValidUsername(!!username);
+          setIsValidPassword(!!password);
+          setShowHelperText(!username || !password);
+        })
+        .finally(() => {
+          setAuthenticating(false);
+        });
     } else {
-      onUserPwdLogin({ username, password }).then((response) => {
-        if ("error" in response) {
-          const receivedError = response.error as MetaResponse;
+      setIsValidUsername(!!username);
+      setIsValidPassword(!!password);
+      setShowHelperText(!username || !password);
+      onUserPwdLogin({ username, password })
+        .then((response) => {
+          if ("error" in response) {
+            const receivedError = response.error as MetaResponse;
 
-          // Get the reason of the error
-          const reason = receivedError.response?.headers.get(
-            "x-ipa-rejection-reason"
-          );
+            // Get the reason of the error
+            const reason = receivedError.response?.headers.get(
+              "x-ipa-rejection-reason"
+            );
 
-          const msg = analyzeErrorReason(reason);
+            const msg = analyzeErrorReason(reason);
 
-          if (msg) {
-            navigate("/reset-password/" + username, {
-              state: { username, msg },
-            });
+            if (msg) {
+              navigate("/reset-password/" + username, {
+                state: { username, msg },
+              });
+            }
+          } else {
+            onSuccessLogin();
           }
-        } else {
-          onSuccessLogin();
-        }
-        setAuthenticating(false);
-      });
+        })
+        .finally(() => {
+          setAuthenticating(false);
+        });
     }
   };
 
@@ -272,24 +286,27 @@ const LoginMainPage = () => {
   const onLoginWithCertClick = (_event) => {
     _event.preventDefault();
     setAuthenticating(true);
-    onCertLogin(username).then((response) => {
-      if ("error" in response) {
-        const receivedError = response.error as MetaResponse;
-        const status = receivedError.response?.status;
-        const statusText = "Authentication with personal certificate failed";
+    onCertLogin(username)
+      .then((response) => {
+        if ("error" in response) {
+          const receivedError = response.error as MetaResponse;
+          const status = receivedError.response?.status;
+          const statusText = "Authentication with personal certificate failed";
 
-        if (status === 200) {
-          onSuccessLogin();
+          if (status === 200) {
+            onSuccessLogin();
+          } else {
+            // Set error without showing the modal
+            setErrorMessage(statusText);
+            setShowHelperText(true);
+          }
         } else {
-          // Set error without showing the modal
-          setErrorMessage(statusText);
-          setShowHelperText(true);
+          onSuccessLogin();
         }
-      } else {
-        onSuccessLogin();
-      }
-      setAuthenticating(false);
-    });
+      })
+      .finally(() => {
+        setAuthenticating(false);
+      });
   };
 
   const socialMediaLoginContent = (
