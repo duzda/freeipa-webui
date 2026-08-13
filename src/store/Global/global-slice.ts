@@ -13,7 +13,7 @@ interface GlobalState {
 }
 
 interface LoggedUserInfo {
-  arguments: string | Record<string, unknown>;
+  arguments: string;
   command: string;
   error: Record<string, unknown>;
   object: string;
@@ -46,10 +46,7 @@ const globalSlice = createSlice({
       const newIpaServerConfig = action.payload;
       state.ipaServerConfiguration = newIpaServerConfig;
     },
-    updateLoggedUserInfo: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
+    updateLoggedUserInfo: (state, action: PayloadAction<string>) => {
       const newLoggedUserInfo = action.payload;
       state.loggedUserInfo = {
         ...state.loggedUserInfo,

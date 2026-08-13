@@ -32,50 +32,45 @@ import ContextualHelpPanel from "./components/ContextualHelpPanel/ContextualHelp
 import headerLogo from "/assets/images/header-logo.png";
 import avatarImg from "/assets/images/avatarImg.svg";
 // Redux
-import { useAppDispatch } from "./store/hooks";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { setLoggedOut } from "./store/Global/auth-slice";
 // RPC
 import { useLogoutMutation } from "./services/rpcAuth";
-import { useGetUserDetailsByUidMutation } from "./services/rpcUsers";
+import { useGetUserByUidQuery } from "./services/rpcUsers";
 
 interface PropsToAppLayout {
-  loggedInUser: string | null;
   children: React.ReactNode;
 }
 
 const AppLayout = (props: PropsToAppLayout) => {
   const dispatch = useAppDispatch();
 
+  const loggedInUser = useAppSelector(
+    (state) => state.global.loggedUserInfo.arguments
+  );
+
   // RPC
   const [logout] = useLogoutMutation();
-  const [getUserDetails] = useGetUserDetailsByUidMutation();
+  const { data: userDetails, isFetching } = useGetUserByUidQuery(loggedInUser, {
+    skip: !loggedInUser,
+  });
 
   // Retrieve and assign user full name
-  const [fullName, setFullName] = React.useState<string>("");
-
-  React.useEffect(() => {
-    if (props.loggedInUser) {
-      getUserDetails(props.loggedInUser).then((response) => {
-        if ("data" in response) {
-          const first = response.data?.result.result.givenname;
-          const last = response.data?.result.result.sn;
-          // Some users (e.g., admin) don't have first name
-          if (!first) {
-            setFullName(last as string);
-          } else {
-            setFullName(first + " " + last);
-          }
-        }
-      });
+  const fullName = React.useMemo(() => {
+    if (!userDetails) return "";
+    if (userDetails.givenname) {
+      return userDetails.givenname + " " + userDetails.sn;
     }
-  }, [props.loggedInUser]);
+
+    return userDetails.sn;
+  }, [userDetails]);
 
   // On logout handler
   const onLogout = () => {
     logout().then((response) => {
       if ("data" in response && !response.data?.error) {
+        sessionStorage.setItem("isKerberosDisabled", "true");
         dispatch(setLoggedOut());
-        localStorage.setItem("isKerberosDisabled", "true");
       }
     });
   };
@@ -118,7 +113,7 @@ const AppLayout = (props: PropsToAppLayout) => {
           className="pf-v6-u-mr-md"
           icon={<Avatar src={avatarImg} alt="avatar" size="sm" />}
         >
-          {fullName}
+          {isFetching ? "" : fullName}
         </MenuToggle>
       )}
       isOpen={isDropdownOpen}

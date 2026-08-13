@@ -546,14 +546,6 @@ const extendedApi = api.injectEndpoints({
         return userList;
       },
     }),
-    getUserDetailsByUid: build.mutation<FindRPCResponse, string>({
-      query: (uid) => {
-        return getCommand({
-          method: "user_show",
-          params: [[uid], { version: API_VERSION_BACKUP }],
-        });
-      },
-    }),
     userFind: build.query<User[], UserFindPayload>({
       query: (payload) => {
         // Add noMembers option if it exists
@@ -675,7 +667,6 @@ export const {
   useGetRadiusProxyQuery,
   useGetIdpServerQuery,
   useGetUsersInfoByUidQuery,
-  useGetUserDetailsByUidMutation,
   useUserFindQuery,
   useAddUserMutation,
 } = extendedApi;
