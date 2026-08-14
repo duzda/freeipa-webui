@@ -1,9 +1,17 @@
-import { api, FindRPCResponse, getCommandNoVersion } from "./rpc";
+import {
+  api,
+  BatchRPCResponse,
+  Command,
+  FindRPCResponse,
+  getBatchCommand,
+  getCommandNoVersion,
+} from "./rpc";
 import { URL_PREFIX } from "src/navigation/NavRoutes";
 import {
   FetchBaseQueryError,
   FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query";
+import { API_VERSION_BACKUP } from "src/utils/utils";
 
 /**
  * Endpoints: userPasswordLogin, logout
@@ -11,6 +19,37 @@ import {
  * API commands:
  * - session_logout: https://freeipa.readthedocs.io/en/latest/api/session_logout.html
  */
+
+const BATCH_COMMANDS_AUTH = [
+  "config_show",
+  "whoami",
+  "env",
+  "dns_is_enabled",
+  "trustconfig_show",
+  "domainlevel_get",
+  "ca_is_enabled",
+  "vaultconfig_show",
+];
+
+const BATCH_COMMANDS_AUTH_PAYLOAD: Command[] = BATCH_COMMANDS_AUTH.map(
+  (method) => {
+    return {
+      method: method,
+      params: [[], {}],
+    };
+  }
+);
+
+export interface UserMetadata {
+  ipaServerConfiguration: Record<string, unknown>;
+  loggedInUser: string;
+  environment: Record<string, unknown>;
+  dnsIsEnabled: boolean;
+  trustConfiguration: Record<string, unknown>;
+  domainLevel: number;
+  caIsEnabled: boolean;
+  vaultConfiguration: Record<string, unknown>;
+}
 
 interface UserPasswordPayload {
   username: string;
@@ -207,8 +246,28 @@ const extendedApi = api.injectEndpoints({
         return meta as unknown as MetaResponse;
       },
     }),
+    userMetadata: build.query<UserMetadata, void>({
+      query: () =>
+        getBatchCommand(BATCH_COMMANDS_AUTH_PAYLOAD, API_VERSION_BACKUP),
+      transformResponse: (response: BatchRPCResponse): UserMetadata => {
+        const results = response.result.results;
+        const whoamiResponse = results[1] as Record<string, unknown>;
+        return {
+          ipaServerConfiguration: results[0].result,
+          loggedInUser: whoamiResponse.arguments?.toString() ?? "",
+          environment: results[2].result,
+          dnsIsEnabled: results[3].result as boolean,
+          trustConfiguration: results[4].result,
+          domainLevel: results[5].result,
+          caIsEnabled: results[6].result,
+          vaultConfiguration: results[7].result,
+        };
+      },
+    }),
   }),
 });
+
+export const authApi = extendedApi;
 
 export const {
   useUserPasswordLoginMutation,
@@ -217,4 +276,5 @@ export const {
   useX509LoginMutation,
   useResetPasswordMutation,
   useSyncOtpMutation,
-} = extendedApi;
+  useUserMetadataQuery,
+} = authApi;

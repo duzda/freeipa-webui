@@ -1,37 +1,14 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { authApi, UserMetadata } from "src/services/rpcAuth";
 
-interface GlobalState {
-  // TODO: Specify data types
-  ipaServerConfiguration: Record<string, unknown>;
-  loggedUserInfo: LoggedUserInfo;
-  environment: Record<string, unknown>;
-  dnsIsEnabled: boolean;
-  trustConfiguration: Record<string, unknown>;
-  domainLevel: Record<string, unknown>;
-  caIsEnabled: Record<string, unknown>;
-  vaultConfiguration: Record<string, unknown>;
-}
-
-interface LoggedUserInfo {
-  arguments: string;
-  command: string;
-  error: Record<string, unknown>;
-  object: string;
-}
-
-const initialState: GlobalState = {
+const initialState: UserMetadata = {
   ipaServerConfiguration: {},
-  loggedUserInfo: {
-    arguments: "",
-    command: "",
-    error: {},
-    object: "",
-  },
+  loggedInUser: "",
   environment: {},
   dnsIsEnabled: false,
   trustConfiguration: {},
-  domainLevel: {},
-  caIsEnabled: {},
+  domainLevel: 0,
+  caIsEnabled: false,
   vaultConfiguration: {},
 };
 
@@ -39,70 +16,24 @@ const globalSlice = createSlice({
   name: "global",
   initialState,
   reducers: {
-    updateIpaServerConfiguration: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
-      const newIpaServerConfig = action.payload;
-      state.ipaServerConfiguration = newIpaServerConfig;
+    // We need logout reducer, whoami together with Kerberos will always report a user thus being unable to logout
+    logoutUser: (state) => {
+      state.loggedInUser = "";
     },
-    updateLoggedUserInfo: (state, action: PayloadAction<string>) => {
-      const newLoggedUserInfo = action.payload;
-      state.loggedUserInfo = {
-        ...state.loggedUserInfo,
-        arguments: newLoggedUserInfo,
-      };
-    },
-    updateEnvironment: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
-      const newEnv = action.payload;
-      state.environment = newEnv;
-    },
-    updateDnsIsEnabled: (state, action: PayloadAction<boolean>) => {
-      const newDnsIsEnabled = action.payload;
-      state.dnsIsEnabled = newDnsIsEnabled;
-    },
-    updateTrustConfiguration: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
-      const newTrustConfig = action.payload;
-      state.trustConfiguration = newTrustConfig;
-    },
-    updateDomainLevel: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
-      const newDomainLevel = action.payload;
-      state.domainLevel = newDomainLevel;
-    },
-    updateCaIsEnabled: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
-      const newCaIsEnabled = action.payload;
-      state.caIsEnabled = newCaIsEnabled;
-    },
-    updateVaultConfiguration: (
-      state,
-      action: PayloadAction<Record<string, unknown>>
-    ) => {
-      const newVaultConfig = action.payload;
-      state.vaultConfiguration = newVaultConfig;
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addMatcher(
+        authApi.endpoints.userMetadata.matchFulfilled,
+        (state, action) => {
+          Object.assign(state, action.payload);
+        }
+      )
+      .addMatcher(authApi.endpoints.userMetadata.matchRejected, (state) => {
+        state.loggedInUser = "";
+      });
   },
 });
 
-export const {
-  updateIpaServerConfiguration,
-  updateLoggedUserInfo,
-  updateEnvironment,
-  updateDnsIsEnabled,
-  updateTrustConfiguration,
-  updateDomainLevel,
-  updateCaIsEnabled,
-  updateVaultConfiguration,
-} = globalSlice.actions;
+export const { logoutUser } = globalSlice.actions;
 export default globalSlice.reducer;
