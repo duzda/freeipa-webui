@@ -8,7 +8,7 @@ import {
 import { afterEach, describe, expect, it, Mock, vi } from "vitest";
 // Component
 import DualListLayout, { DualListProps } from "./DualListLayout";
-import { renderWithRouter } from "src/utils/testUtils";
+import { renderWithRouter } from "src/utils/testRouterUtils";
 
 interface MockReturn {
   data: { list: string[] } | { error: { message: string } };
@@ -28,10 +28,6 @@ const retrieveIDs: Mock<() => Promise<MockReturn>> = vi.fn(async () => {
 });
 
 vi.mock("src/services/rpc", () => ({
-  api: {
-    reducer: () => ({}),
-    middleware: () => (next) => next,
-  },
   useGetIDListMutation: () => [retrieveIDs],
 }));
 

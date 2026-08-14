@@ -3,7 +3,7 @@ import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 // Component
 import PaginationLayout from "./PaginationLayout";
-import { renderWithRouter } from "src/utils/testUtils";
+import { renderWithRouter } from "src/utils/testRouterUtils";
 
 const list = Array.from({ length: 50 }, (_, i) => `item-${i + 1}`);
 
