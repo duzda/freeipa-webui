@@ -24,6 +24,7 @@ import BrandImg from "/assets/images/product-name.png";
 import BackgroundImg from "/assets/images/login-screen-background.jpg";
 // RPC
 import {
+  authApi,
   MetaResponse,
   useKrbLoginMutation,
   useUserPasswordLoginMutation,
@@ -35,7 +36,6 @@ import { useAppDispatch } from "src/store/hooks";
 import { useLocation, useNavigate } from "react-router";
 import { Link } from "react-router";
 import { LoginPage } from "./LoginPage";
-import { setLoggedIn } from "src/store/Global/auth-slice";
 
 interface StateFromSyncOtpPage {
   alertMessage: string;
@@ -119,8 +119,6 @@ const LoginMainPage = () => {
             // Set error without showing the modal
             setErrorMessage("Authentication with Kerberos failed");
           }
-        } else {
-          onSuccessLogin();
         }
       });
     }
@@ -163,10 +161,24 @@ const LoginMainPage = () => {
   };
 
   // Action on login success
-  const onSuccessLogin = () => {
-    // Sore data on Redux
-    dispatch(setLoggedIn());
-    sessionStorage.removeItem("isKerberosDisabled");
+  const onSuccessLogin = async () => {
+    try {
+      await dispatch(
+        authApi.endpoints.userMetadata.initiate(undefined, {
+          forceRefetch: true,
+          subscribe: false,
+        })
+      ).unwrap();
+      sessionStorage.removeItem("isKerberosDisabled");
+    } catch (error) {
+      setShowErrorModal(true);
+      setErrorMessage(
+        "Error fetching user metadata: " +
+          (typeof error === "object" && error !== null && "message" in error
+            ? error.message
+            : "Unknown error")
+      );
+    }
   };
 
   // Analyze the error reason

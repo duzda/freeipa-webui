@@ -87,14 +87,14 @@ import { AppLayout } from "src/AppLayout";
 // Renders routes (React)
 export const AppRoutes = (): React.ReactElement => {
   // Redux: Get if user is logged in
-  const loggedIn = useAppSelector((state) => state.auth.loggedIn);
+  const loggedInUser = useAppSelector((state) => state.global.loggedInUser);
 
   const configurationSettings = useConfigurationSettings();
   const dnsIsEnabled = configurationSettings.dnsIsEnabled;
 
   return (
     <Routes>
-      {loggedIn ? (
+      {loggedInUser !== "" ? (
         <>
           <Route path="/" element={<AppLayout />}>
             <Route path="active-users">

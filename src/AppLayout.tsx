@@ -33,24 +33,24 @@ import headerLogo from "/assets/images/header-logo.png";
 import avatarImg from "/assets/images/avatarImg.svg";
 // Redux
 import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { setLoggedOut } from "./store/Global/auth-slice";
 // RPC
 import { useLogoutMutation } from "./services/rpcAuth";
 import { useGetUserByUidQuery } from "./services/rpcUsers";
 import { Outlet } from "react-router";
+import { logoutUser } from "./store/Global/global-slice";
 
 const AppLayout = () => {
   const dispatch = useAppDispatch();
-
-  const loggedInUser = useAppSelector(
-    (state) => state.global.loggedUserInfo.arguments
-  );
+  const loggedInUser = useAppSelector((state) => state.global.loggedInUser);
 
   // RPC
   const [logout] = useLogoutMutation();
-  const { data: userDetails, isFetching } = useGetUserByUidQuery(loggedInUser, {
-    skip: !loggedInUser,
-  });
+  const { data: userDetails, isFetching } = useGetUserByUidQuery(
+    loggedInUser!,
+    {
+      skip: !loggedInUser,
+    }
+  );
 
   // Retrieve and assign user full name
   const fullName = React.useMemo(() => {
@@ -67,7 +67,7 @@ const AppLayout = () => {
     logout().then((response) => {
       if ("data" in response && !response.data?.error) {
         sessionStorage.setItem("isKerberosDisabled", "true");
-        dispatch(setLoggedOut());
+        dispatch(logoutUser());
       }
     });
   };

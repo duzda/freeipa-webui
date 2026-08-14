@@ -27,9 +27,7 @@ const ResetPassword = (props: PropsToResetPassword) => {
   const dispatch = useAppDispatch();
 
   // Get current logged-in user info
-  const loggedInUser = useAppSelector(
-    (state) => state.global.loggedUserInfo.arguments
-  );
+  const loggedInUser = useAppSelector((state) => state.global.loggedInUser);
 
   // RPC hooks
   const [resetPassword] = useChangePasswordMutation();

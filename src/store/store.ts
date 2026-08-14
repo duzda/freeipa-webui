@@ -3,7 +3,6 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import globalReducer from "./Global/global-slice";
 import { api } from "../services/rpc";
 import routesReducer from "./Global/routes-slice";
-import authReducer from "./Global/auth-slice";
 import alertsReducer from "./Global/alerts-slice";
 import contextualHelpReducer from "./Global/contextual-help-slice";
 
@@ -13,7 +12,6 @@ export const setupStore = () => {
       api: api.reducer,
       global: globalReducer,
       routes: routesReducer,
-      auth: authReducer,
       alerts: alertsReducer,
       contextualHelp: contextualHelpReducer,
     },
