@@ -35,32 +35,38 @@ interface PropsToAdd {
   searchProps?: SearchProps;
 }
 
-const MemberOfAddModal = (props: PropsToAdd) => {
+const InnerMemberOfAddModal = (props: PropsToAdd) => {
   // Dual list data
-  const data = props.availableItems.map((d) => d.key);
+  const availableItemsIDs = React.useMemo(
+    () => props.availableItems.map((d) => d.key),
+    [props.availableItems]
+  );
 
   // States
+  const [previousAvailableItemsIDs, setPreviousAvailableItemsIDs] =
+    React.useState<string[]>([]);
+
+  // Options
   const [availableOptions, setAvailableOptions] = React.useState<
     DualListOption[]
-  >(() => optionsToDualListOptions(data));
+  >(() => optionsToDualListOptions(availableItemsIDs));
   const [chosenOptions, setChosenOptions] = React.useState<DualListOption[]>(
     []
   );
 
-  // Update available and chosen options when props.availableItems changes
-  React.useEffect(() => {
-    const newAval = data.filter(
-      (d) => !chosenOptions.map((o) => o.text).includes(d)
+  if (
+    JSON.stringify(previousAvailableItemsIDs) !==
+    JSON.stringify(availableItemsIDs)
+  ) {
+    setPreviousAvailableItemsIDs(availableItemsIDs);
+    setAvailableOptions(
+      optionsToDualListOptions(
+        availableItemsIDs.filter(
+          (id) => !chosenOptions.map((o) => o.text).includes(id)
+        )
+      )
     );
-    setAvailableOptions(optionsToDualListOptions(newAval));
-  }, [props.availableItems]);
-
-  // reset dialog on close
-  React.useEffect(() => {
-    if (!props.showModal) {
-      cleanData();
-    }
-  }, [props.showModal]);
+  }
 
   const fields = [
     {
@@ -79,24 +85,15 @@ const MemberOfAddModal = (props: PropsToAdd) => {
     },
   ];
 
-  // When clean data, set to original values
-  const cleanData = () => {
-    setAvailableOptions(optionsToDualListOptions(data));
-    setChosenOptions([]);
-  };
-
   // Buttons are disabled until the user fills the required fields
   const buttonDisabled = chosenOptions.length === 0;
 
   // Add group option
   const onClickAddHandler = () => {
-    const optionsToAdd: AvailableItems[] = [];
-    chosenOptions.map((opt) => {
-      optionsToAdd.push({
-        key: opt.text,
-        title: opt.text,
-      });
-    });
+    const optionsToAdd: AvailableItems[] = chosenOptions.map((opt) => ({
+      key: opt.text,
+      title: opt.text,
+    }));
     props.onAdd(optionsToAdd);
     setChosenOptions([]);
   };
@@ -154,6 +151,14 @@ const MemberOfAddModal = (props: PropsToAdd) => {
       <ModalFooter>{modalActions}</ModalFooter>
     </Modal>
   );
+};
+
+const MemberOfAddModal = (props: PropsToAdd) => {
+  if (!props.showModal) {
+    return null;
+  }
+
+  return <InnerMemberOfAddModal {...props} />;
 };
 
 export default MemberOfAddModal;
