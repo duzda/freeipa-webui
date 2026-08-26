@@ -127,7 +127,7 @@ const asItems = (options: string[]): Item[] =>
 // Dual list layout for updating an existing table, or for performing actions
 // against entries
 const DualListTableLayoutInner = (props: DualListProps) => {
-  const [availableOptions, setAvailableOptions] = useState<Item[]>(
+  const [availableOptions, setAvailableOptions] = useState<Item[]>(() =>
     asItems(props.availableOptions ?? [])
   );
   const [chosenOptions, setChosenOptions] = useState<Item[]>([]);
